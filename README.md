@@ -6,8 +6,7 @@ O **Cashlytics** é uma aplicação web desenvolvida com **HTML, CSS e JavaScrip
 
 ## ✨ Demonstração
 
-🔗 Acesse: [https://dashboardcashlytics.netlify.app/]
-
+🔗 Acesse: https://dashboardcashlytics.netlify.app/
 
 ## 🧠 Sobre o projeto
 
@@ -18,7 +17,6 @@ Este projeto foi desenvolvido com o objetivo de:
 - Simular um sistema real de controle financeiro
 - Criar um projeto relevante para portfólio (foco em dados)
 
-
 ## ⚙️ Tecnologias utilizadas
 
 - HTML5
@@ -27,7 +25,6 @@ Este projeto foi desenvolvido com o objetivo de:
 - Chart.js (visualização de dados)
 - jsPDF + jsPDF-AutoTable (geração de extratos em PDF)
 - localStorage (persistência de dados)
-
 
 ## 📊 Funcionalidades
 
@@ -89,11 +86,13 @@ Este projeto foi desenvolvido com o objetivo de:
 ## 📂 Estrutura do projeto
 
 ```
+
 cashlytics/
 │
 ├── index.html       # Aplicação completa (HTML + CSS + JS em arquivo único)
 └── README.md        # Este arquivo
-```
+
+````
 
 ## ▶️ Como executar
 
@@ -101,7 +100,7 @@ cashlytics/
 
 ```bash
 git clone https://github.com/mayandev1/cashlytics.git
-```
+````
 
 2. Abra o arquivo:
 
@@ -115,50 +114,50 @@ index.html
 
 ### ✅ Prós
 
-- Interface moderna e profissional
-- Código simples e direto (sem frameworks)
-- Uso eficiente de `localStorage`
-- Boa base para evoluir para aplicações maiores
-- Visualização de dados clara e útil
-- Extrato em PDF personalizável por período
-- Projeto forte para portfólio (especialmente área de dados)
-- Otimizado para 120fps com `will-change`, `contain` e `translate3d`
+* Interface moderna e profissional
+* Código simples e direto (sem frameworks)
+* Uso eficiente de `localStorage`
+* Boa base para evoluir para aplicações maiores
+* Visualização de dados clara e útil
+* Extrato em PDF personalizável por período
+* Projeto forte para portfólio (especialmente área de dados)
+* Otimizado para 120fps com `will-change`, `contain` e `translate3d`
 
 ### ❌ Contras
 
-- Dados limitados ao navegador (não sincroniza entre dispositivos)
-- Sem sistema de login/autenticação
-- Não permite edição de transações (apenas exclusão)
-- Dependência de CDN (Chart.js, jsPDF)
-- Escalabilidade limitada sem backend
+* Dados limitados ao navegador (não sincroniza entre dispositivos)
+* Sem sistema de login/autenticação
+* Não permite edição de transações (apenas exclusão)
+* Dependência de CDN (Chart.js, jsPDF)
+* Escalabilidade limitada sem backend
 
 ## 🛠️ Melhorias futuras
 
-- ✏️ Edição de transações
-- 📤 Exportar/importar dados (JSON/CSV)
-- 🔁 Transações recorrentes
-- 🎯 Metas de orçamento por categoria
-- 🌐 Suporte a múltiplas moedas
-- 🎨 Alternância de tema (dark/light)
-- ☁️ Integração com backend + autenticação
-- 👤 Cadastro completo do titular (quando houver backend)
+* ✏️ Edição de transações
+* 📤 Exportar/importar dados (JSON/CSV)
+* 🔁 Transações recorrentes
+* 🎯 Metas de orçamento por categoria
+* 🌐 Suporte a múltiplas moedas
+* 🎨 Alternância de tema (dark/light)
+* ☁️ Integração com backend + autenticação
+* 👤 Cadastro completo do titular (quando houver backend)
 
 ## 📌 Aprendizados
 
 Durante o desenvolvimento deste projeto, foram trabalhados conceitos como:
 
-- Manipulação de estado no JavaScript
-- Estruturação de código sem frameworks
-- Visualização de dados com gráficos
-- Organização de UI/UX
-- Persistência de dados no navegador
-- Geração de PDFs client-side com jsPDF
-- Otimização de performance para telas de alta taxa de atualização
+* Manipulação de estado no JavaScript
+* Estruturação de código sem frameworks
+* Visualização de dados com gráficos
+* Organização de UI/UX
+* Persistência de dados no navegador
+* Geração de PDFs client-side com jsPDF
+* Otimização de performance para telas de alta taxa de atualização
 
 ## 👨‍💻 Autor
 
-Desenvolvido por **Mayan Gabriel**  
-🔗 [https://github.com/mayandev1](https://github.com/mayandev1)
+Desenvolvido por **Mayan Gabriel**
+🔗 [https://github.com/mayandev1]
 
 ## 📄 Licença
 
