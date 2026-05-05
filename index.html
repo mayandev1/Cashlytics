@@ -980,7 +980,7 @@ body {
       <div class="welcome-mark"><i class="fa-solid fa-chart-line"></i></div>
       <div>
         <div class="welcome-brand-name">Cash<span>lytics</span></div>
-        <div class="welcome-tagline">Painel financeiro pessoal</div>
+        <div class="welcome-tagline">Painel Financeiro Pessoal</div>
       </div>
     </div>
 
@@ -1083,7 +1083,7 @@ body {
       <div class="brand-mark"><i class="fa-solid fa-chart-line"></i></div>
       <div>
         <div class="brand-name">Cashlytics</div>
-        <span class="brand-tag">Painel financeiro pessoal</span>
+        <span class="brand-tag">Painel Financeiro Pessoal</span>
       </div>
     </a>
     <div class="header-right">
@@ -1868,190 +1868,323 @@ body {
       doc.line(14, H - 14, W - 14, H - 14);
     }
 
+    function pdfMoney(v) {
+      // Retorna { symbol, value } para renderização separada
+      const raw = new Intl.NumberFormat("pt-BR", {
+        minimumFractionDigits: 2, maximumFractionDigits: 2
+      }).format(Math.abs(v || 0));
+      return { symbol: "R$", value: raw };
+    }
+
+    // Renderiza valor monetário com símbolo separado (alinha pela direita)
+    function drawMoney(val, x, y, color, fontSize) {
+      const m = pdfMoney(val);
+      doc.setFontSize(fontSize); doc.setFont("helvetica","bold");
+      // Valor numérico alinhado à direita
+      doc.setTextColor(...color);
+      doc.text(m.value, x, y, { align:"right" });
+      // Símbolo "R$" levemente menor, à esquerda do valor
+      const valWidth = doc.getTextWidth(m.value);
+      doc.setFontSize(fontSize * 0.78);
+      doc.setTextColor(...color.map(c => Math.round(c * 0.75))); // levemente mais escuro
+      doc.text(m.symbol, x - valWidth - 1.5, y, { align:"right" });
+    }
+
     // ── PÁGINA 1 ──
     drawPageBg();
     drawPageFooter();
-    y = 14;
+    y = 0;
 
-    // Logo mark (lime square)
+    // ════════════════════════════════════════════
+    //  HEADER BAND — faixa escura no topo
+    // ════════════════════════════════════════════
+    doc.setFillColor(...C.bg2);
+    doc.rect(0, 0, W, 38, "F");
+
+    // Linha lime no topo (mais espessa no header)
     doc.setFillColor(...C.lime);
-    doc.roundedRect(14, y, 10, 10, 2, 2, "F");
-    doc.setFontSize(7); doc.setTextColor(...C.bg);
+    doc.rect(0, 0, W, 2, "F");
+
+    // ── Logo: quadrado lime com "C" bold, mais espaçoso ──
+    const markX = 14, markY = 9, markS = 20, markR = 4;
+    doc.setFillColor(...C.lime);
+    doc.roundedRect(markX, markY, markS, markS, markR, markR, "F");
+
+    // Reflexo interno (brilho no topo do quadrado)
+    doc.setFillColor(255,255,255);
+    doc.setGState(doc.GState({ opacity: 0.15 }));
+    doc.roundedRect(markX + 2, markY + 2, markS - 4, markS * 0.4, 2, 2, "F");
+    doc.setGState(doc.GState({ opacity: 1 }));
+
+    // Letra "C" centralizada no quadrado
+    doc.setFontSize(13); doc.setTextColor(...C.bg);
     doc.setFont("helvetica","bold");
-    doc.text("C", 19, y + 6.8, { align:"center" });
+    doc.text("C", markX + markS / 2, markY + markS * 0.65, { align:"center" });
 
-    // Brand name
-    doc.setFontSize(16); doc.setTextColor(...C.white);
-    doc.setFont("helvetica","bold");
-    doc.text("Cashlytics", 27, y + 7.5);
+    // ── Nome da marca: "Cash" normal + "lytics" em peso diferente ──
+    const brandX = markX + markS + 6;
+    doc.setFontSize(18); doc.setFont("helvetica","bold");
+    doc.setTextColor(...C.white);
+    const cashW = doc.getTextWidth("Cash");
+    doc.text("Cash", brandX, markY + 13);
+    doc.setTextColor(...C.lime);
+    doc.text("lytics", brandX + cashW, markY + 13);
 
-    // Tagline
-    doc.setFontSize(8); doc.setTextColor(...C.text3);
-    doc.setFont("helvetica","normal");
-    doc.text("Seu Painel Financeiro Pessoal", 27, y + 12);
+    // Tagline abaixo do nome
+    doc.setFontSize(7.5); doc.setFont("helvetica","normal");
+    doc.setTextColor(...C.text3);
+    doc.text("Extrato Financeiro Pessoal", brandX, markY + 20);
 
-    // Generated at
+    // Ponto decorativo separador
+    doc.setFillColor(...C.text3);
+    doc.circle(brandX + doc.getTextWidth("Extrato Financeiro Pessoal") + 4, markY + 19, 0.5, "F");
+
+    // Data de geração (canto direito, alinhada verticalmente no header)
     const now = new Date();
-    const geradoEm = now.toLocaleDateString("pt-BR") + " às " +
+    const geradoEm = now.toLocaleDateString("pt-BR") + "  " +
       now.toLocaleTimeString("pt-BR", { hour:"2-digit", minute:"2-digit" });
-    doc.setFontSize(8); doc.setTextColor(...C.text3);
-    doc.text(`Gerado em ${geradoEm}`, W - 14, y + 7, { align:"right" });
+    doc.setFontSize(7); doc.setFont("helvetica","normal");
+    doc.setTextColor(...C.text3);
+    doc.text("GERADO EM", W - 14, markY + 10, { align:"right" });
+    doc.setFontSize(8.5); doc.setTextColor(...C.text2);
+    doc.text(geradoEm, W - 14, markY + 16, { align:"right" });
 
-    y += 22;
+    y = 44;
 
-    // ── Divider ──
-    doc.setDrawColor(...C.border);
-    doc.setLineWidth(0.4);
-    doc.line(14, y, W - 14, y);
+    // ════════════════════════════════════════════
+    //  BLOCO TITULAR + PERÍODO
+    // ════════════════════════════════════════════
+    // Label TITULAR
+    doc.setFontSize(7); doc.setFont("helvetica","bold");
+    doc.setTextColor(...C.text3);
+    doc.setCharSpace(1.5);
+    doc.text("TITULAR", 14, y);
+    doc.setCharSpace(0);
+    y += 5;
+
+    // Nome grande
+    doc.setFontSize(16); doc.setFont("helvetica","bold");
+    doc.setTextColor(...C.white);
+    doc.text(nome, 14, y);
+    y += 6;
+
+    // Período com ícone de calendário simulado
+    const fmtPeriod = `${fmtDate(from)}  —  ${fmtDate(to)}`;
+    doc.setFontSize(8); doc.setFont("helvetica","normal");
+    doc.setTextColor(...C.text2);
+    doc.text(fmtPeriod, 14, y);
+
+    // Pill de destaque do período (canto direito)
+    const pillLabel = `${filtered.length} transacoes`;
+    const pillW = doc.getTextWidth(pillLabel) + 10;
+    doc.setFillColor(...C.bg3);
+    doc.roundedRect(W - 14 - pillW, y - 5, pillW, 7, 2, 2, "F");
+    doc.setFillColor(...C.lime);
+    doc.roundedRect(W - 14 - pillW, y - 5, 2, 7, 1, 1, "F");
+    doc.setFontSize(7); doc.setFont("helvetica","bold");
+    doc.setTextColor(...C.lime);
+    doc.text(pillLabel, W - 14 - pillW + 6, y - 0.5);
+
     y += 10;
 
-    // ── Titular ──
-    doc.setFontSize(9); doc.setTextColor(...C.text3);
-    doc.setFont("helvetica","normal");
-    doc.text("TITULAR", 14, y);
-    y += 5;
-    doc.setFontSize(14); doc.setTextColor(...C.white);
-    doc.setFont("helvetica","bold");
-    doc.text(nome, 14, y);
-    y += 5;
+    // Divider fino
+    doc.setDrawColor(...C.border);
+    doc.setLineWidth(0.3);
+    doc.line(14, y, W - 14, y);
+    y += 8;
 
-    // Período badge
-    const fmtPeriod = `${fmtDate(from)} a ${fmtDate(to)}`;
-    doc.setFontSize(8); doc.setTextColor(...C.text2);
-    doc.setFont("helvetica","normal");
-    doc.text(`Período: ${fmtPeriod}`, 14, y);
-    y += 12;
-
-    // ── Summary cards ──
-    // Tres cards lado a lado
+    // ════════════════════════════════════════════
+    //  SUMMARY CARDS — 3 cards lado a lado
+    // ════════════════════════════════════════════
     const cardW = (W - 28 - 8) / 3;
     const cards = [
-      { label:"TOTAL DE ENTRADAS", value: fmt(inc),   color: C.green },
-      { label:"TOTAL DE SAÍDAS",   value: fmt(exp),   color: C.red   },
-      { label:"SALDO DO PERÍODO",  value: fmt(saldo), color: saldo >= 0 ? C.lime : C.red },
+      { label:"TOTAL DE ENTRADAS", amount: inc,   color: C.green, sign: "+" },
+      { label:"TOTAL DE SAIDAS",   amount: exp,   color: C.red,   sign: "-" },
+      { label:"SALDO DO PERIODO",  amount: saldo, color: saldo >= 0 ? C.lime : C.red, sign: saldo >= 0 ? "+" : "-" },
     ];
 
     cards.forEach((card, i) => {
       const cx = 14 + i * (cardW + 4);
-      // card bg
+      const ch = 26;
+
+      // Card background
       doc.setFillColor(...C.bg2);
-      doc.roundedRect(cx, y, cardW, 22, 3, 3, "F");
-      // top accent line
+      doc.roundedRect(cx, y, cardW, ch, 3, 3, "F");
+
+      // Borda lateral colorida (esquerda)
       doc.setFillColor(...card.color);
-      doc.roundedRect(cx, y, cardW, 1.5, 1, 1, "F");
-      // label
-      doc.setFontSize(7); doc.setTextColor(...C.text3);
-      doc.setFont("helvetica","bold");
-      doc.text(card.label, cx + 6, y + 8);
-      // value
-      doc.setFontSize(11); doc.setTextColor(...card.color);
-      doc.setFont("helvetica","bold");
-      doc.text(card.value, cx + 6, y + 17);
+      doc.roundedRect(cx, y, 2.5, ch, 1, 1, "F");
+
+      // Label
+      doc.setFontSize(6.5); doc.setFont("helvetica","bold");
+      doc.setTextColor(...C.text3);
+      doc.setCharSpace(0.8);
+      doc.text(card.label, cx + 8, y + 8);
+      doc.setCharSpace(0);
+
+      // Valor: símbolo separado do número para encoding correto
+      drawMoney(card.amount, cx + cardW - 7, y + 19, card.color, 11);
     });
-    y += 30;
+    y += 34;
 
-    // ── Transactions title ──
-    doc.setFontSize(9); doc.setTextColor(...C.lime);
-    doc.setFont("helvetica","bold");
-    doc.text("TRANSAÇÕES DO PERÍODO", 14, y);
-    doc.setFontSize(8); doc.setTextColor(...C.text3);
-    doc.setFont("helvetica","normal");
-    doc.text(`${filtered.length} ${filtered.length === 1 ? "transação" : "transações"}`, W - 14, y, { align:"right" });
-    y += 6;
+    // ════════════════════════════════════════════
+    //  HEADER DAS TRANSAÇÕES
+    // ════════════════════════════════════════════
+    doc.setFontSize(7.5); doc.setFont("helvetica","bold");
+    doc.setTextColor(...C.lime);
+    doc.setCharSpace(1.5);
+    doc.text("TRANSACOES DO PERIODO", 14, y);
+    doc.setCharSpace(0);
+    y += 7;
 
-    doc.setDrawColor(...C.border);
-    doc.line(14, y, W - 14, y);
-    y += 6;
+    // Cabeçalho da tabela
+    doc.setFillColor(...C.bg3);
+    doc.rect(14, y, W - 28, 7, "F");
+    doc.setFontSize(6.5); doc.setFont("helvetica","bold");
+    doc.setTextColor(...C.text3);
+    doc.setCharSpace(0.5);
+    doc.text("CATEGORIA", 20, y + 4.8);
+    doc.text("DESCRICAO", 55, y + 4.8);
+    doc.text("VALOR", W - 20, y + 4.8, { align:"right" });
+    doc.setCharSpace(0);
+    y += 10;
 
-    // ── Transações por data ──
+    // ════════════════════════════════════════════
+    //  TRANSAÇÕES POR DATA
+    // ════════════════════════════════════════════
     byDate.forEach((txs, date) => {
-      checkPage(16 + txs.length * 11);
+      checkPage(18 + txs.length * 11);
 
-      // Date header
-      doc.setFillColor(...C.bg3);
-      doc.roundedRect(14, y, W - 28, 8, 2, 2, "F");
+      // Cabeçalho de data
+      doc.setFillColor(...C.bg2);
+      doc.rect(14, y, W - 28, 9, "F");
+      // Linha lime fina à esquerda na data
+      doc.setFillColor(...C.lime);
+      doc.rect(14, y, 2, 9, "F");
+
       doc.setFontSize(8.5); doc.setTextColor(...C.text2);
       doc.setFont("helvetica","bold");
-      doc.text(fmtDate(date), 19, y + 5.5);
+      doc.text(fmtDate(date), 20, y + 6);
 
-      // Saldo do dia
+      // Saldo do dia (direita)
       let dayBal = 0;
-      txs.forEach(t => dayBal += t.type==="income" ? t.amount : -t.amount);
+      txs.forEach(t => dayBal += t.type === "income" ? t.amount : -t.amount);
       const dayBalColor = dayBal >= 0 ? C.green : C.red;
-      doc.setFontSize(8); doc.setTextColor(...dayBalColor);
-      doc.text(`Saldo do dia: ${fmt(dayBal)}`, W - 19, y + 5.5, { align:"right" });
+      doc.setFontSize(7.5); doc.setFont("helvetica","normal");
+      doc.setTextColor(...C.text3);
+      const sdLabel = "saldo do dia  ";
+      doc.text(sdLabel, W - 19 - doc.getTextWidth(sdLabel) - 28, y + 6);
+      drawMoney(dayBal, W - 19, y + 6, dayBalColor, 8.5);
 
       y += 12;
 
-      // Transactions for this date
+      // Linhas de transação
       txs.forEach((t, idx) => {
         checkPage(11);
-        const isIncome  = t.type === "income";
-        const cat       = getCat(t.category);
-        const sign      = isIncome ? "+" : "−";
-        const amtColor  = isIncome ? C.green : C.red;
+        const isIncome = t.type === "income";
+        const cat      = getCat(t.category);
+        const amtColor = isIncome ? C.green : C.red;
 
-        // Alternate row bg
+        // Zebra alternado
         if (idx % 2 === 0) {
-          doc.setFillColor(...C.bg2);
-          doc.rect(14, y - 1, W - 28, 9.5, "F");
+          doc.setFillColor(...C.bg2.map(c => Math.min(255, c + 4)));
+          doc.rect(14, y - 1.5, W - 28, 10, "F");
         }
 
-        // Category chip
+        // Chip de categoria: bordinha colorida + texto
+        const chipColor = isIncome ? C.green : C.red;
         doc.setFillColor(...C.bg3);
-        doc.roundedRect(19, y + 1, 28, 5.5, 1.5, 1.5, "F");
-        doc.setFontSize(6.5); doc.setTextColor(...C.text3);
-        doc.setFont("helvetica","normal");
-        doc.text(cat.label, 33, y + 4.5, { align:"center" });
+        doc.roundedRect(20, y, 30, 5.5, 1.5, 1.5, "F");
+        doc.setFillColor(...chipColor);
+        doc.roundedRect(20, y, 1.5, 5.5, 0.5, 0.5, "F");
+        doc.setFontSize(6); doc.setFont("helvetica","normal");
+        doc.setTextColor(...C.text3);
+        doc.text(cat.label, 35, y + 4, { align:"center" });
 
-        // Description
-        doc.setFontSize(9); doc.setTextColor(...C.text);
-        doc.setFont("helvetica","normal");
-        const desc = t.description.length > 38 ? t.description.slice(0,35)+"..." : t.description;
-        doc.text(desc, 52, y + 5);
+        // Descrição
+        doc.setFontSize(8.5); doc.setFont("helvetica","normal");
+        doc.setTextColor(...C.text);
+        const desc = t.description.length > 36 ? t.description.slice(0, 33) + "..." : t.description;
+        doc.text(desc, 55, y + 4.5);
 
-        // Amount
-        doc.setFontSize(9); doc.setTextColor(...amtColor);
-        doc.setFont("helvetica","bold");
-        doc.text(`${sign} ${fmt(t.amount)}`, W - 19, y + 5, { align:"right" });
+        // Valor com sinal — símbolo e número separados
+        const signChar = isIncome ? "+" : "-";
+        const m = pdfMoney(t.amount);
+
+        // Sinal colorido
+        doc.setFontSize(8); doc.setFont("helvetica","bold");
+        doc.setTextColor(...amtColor);
+        const numWidth  = doc.getTextWidth(m.value);
+        const symWidth  = doc.getTextWidth("R$") * 0.78 + 1.5;
+        const signWidth = doc.getTextWidth(signChar) + 1;
+        doc.text(signChar, W - 19 - numWidth - symWidth - signWidth + doc.getTextWidth(signChar), y + 4.5);
+
+        drawMoney(t.amount, W - 19, y + 4.5, amtColor, 9);
 
         y += 10;
       });
 
-      // Separator between dates
+      // Separador entre datas
       doc.setDrawColor(...C.border);
       doc.setLineWidth(0.2);
       doc.line(14, y, W - 14, y);
-      y += 6;
+      y += 5;
     });
 
-    // ── Sumário final ──
-    checkPage(40);
-    y += 4;
+    // ════════════════════════════════════════════
+    //  RESUMO FINAL
+    // ════════════════════════════════════════════
+    checkPage(44);
+    y += 6;
+
+    // Card de resumo
+    const resumoH = 40;
     doc.setFillColor(...C.bg2);
-    doc.roundedRect(14, y, W - 28, 32, 4, 4, "F");
+    doc.roundedRect(14, y, W - 28, resumoH, 4, 4, "F");
+
+    // Faixa lime no topo do card
     doc.setFillColor(...C.lime);
-    doc.roundedRect(14, y, W - 28, 1.5, 1, 1, "F");
+    doc.roundedRect(14, y, W - 28, 2, 2, 2, "F");
 
-    doc.setFontSize(9); doc.setTextColor(...C.lime);
-    doc.setFont("helvetica","bold");
+    // Título do resumo
+    doc.setFontSize(7); doc.setFont("helvetica","bold");
+    doc.setTextColor(...C.lime);
+    doc.setCharSpace(1.5);
     doc.text("RESUMO FINAL", 20, y + 9);
+    doc.setCharSpace(0);
 
-    const summaryRows = [
-      { label:"Total de entradas", value: fmt(inc),   color: C.green },
-      { label:"Total de saídas",   value: fmt(exp),   color: C.red   },
-      { label:"Saldo final",       value: fmt(saldo), color: saldo >= 0 ? C.lime : C.red },
+    // Linha separadora interna
+    doc.setDrawColor(...C.border);
+    doc.setLineWidth(0.3);
+    doc.line(20, y + 12, W - 20, y + 12);
+
+    const resumoRows = [
+      { label:"Total de entradas", amount: inc,   color: C.green },
+      { label:"Total de saidas",   amount: exp,   color: C.red   },
+      { label:"Saldo final",       amount: saldo, color: saldo >= 0 ? C.lime : C.red },
     ];
-    let sy = y + 16;
-    summaryRows.forEach(row => {
-      doc.setFontSize(9); doc.setTextColor(...C.text2);
-      doc.setFont("helvetica","normal");
-      doc.text(row.label, 20, sy);
-      doc.setTextColor(...row.color);
-      doc.setFont("helvetica","bold");
-      doc.text(row.value, W - 20, sy, { align:"right" });
-      sy += 7;
+
+    let ry = y + 19;
+    resumoRows.forEach((row, i) => {
+      // Última linha em destaque
+      if (i === resumoRows.length - 1) {
+        doc.setFillColor(...row.color.map(c => Math.round(c * 0.12)));
+        doc.rect(20, ry - 4, W - 40, 9, "F");
+      }
+      doc.setFontSize(8.5); doc.setFont("helvetica","normal");
+      doc.setTextColor(...C.text2);
+      doc.text(row.label, 22, ry);
+      drawMoney(row.amount, W - 20, ry, row.color, 9.5);
+      ry += 8;
     });
+
+    y += resumoH + 8;
+
+    // Assinatura / rodapé do extrato
+    doc.setFontSize(7); doc.setFont("helvetica","normal");
+    doc.setTextColor(...C.text3);
+    doc.text("Documento gerado eletronicamente por Cashlytics.", W / 2, y, { align:"center" });
+    doc.text("Os dados refletem o que foi inserido manualmente pelo usuario.", W / 2, y + 5, { align:"center" });
 
     // ── Salvar ──
     const fileName = `extrato_${nome.toLowerCase().replace(/\s+/g,"_")}_${from}_${to}.pdf`;
